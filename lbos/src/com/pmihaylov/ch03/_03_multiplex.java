@@ -2,13 +2,13 @@ package com.pmihaylov.ch03;
 
 import java.util.concurrent.Semaphore;
 
-import static com.pmihaylov.common.Utils.ignoreInterruptedException;
+import static com.pmihaylov.common.Utils.handleInterruptedException;
 
 public class _03_multiplex {
     public static void main(String[] args) throws InterruptedException {
         Semaphore sem = new Semaphore(5);
         for (int i = 0; i < 20; i++) {
-            new Thread(() -> ignoreInterruptedException(() -> {
+            new Thread(() -> handleInterruptedException(() -> {
                 sem.acquire();
                 try {
                     System.out.printf("%s is executing statement & sleeping for 2s\n", Thread.currentThread().getName());
