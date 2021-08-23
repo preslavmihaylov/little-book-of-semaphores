@@ -24,7 +24,8 @@ public class _08_rollerCoaster {
         ExecutorService exec = Executors.newCachedThreadPool();
         Semaphore waitingPassengersQueue = new Semaphore(0);
         AtomicReference<CarData> waitingCar = new AtomicReference<>();
-        Lock carLock = new ReentrantLock(true);
+        Lock loadingAreaLock = new ReentrantLock(true);
+        Lock unloadingAreaLock = new ReentrantLock(true);
 
         // cars
         for (int i = 0; i < CARS_CNT; i++) {
@@ -33,7 +34,7 @@ public class _08_rollerCoaster {
                 CarData thisCarData = new CarData(carID);
                 while (true) {
                     System.out.printf("Car #%d has arrived at the entrance...\n", carID);
-                    carLock.lock();
+                    loadingAreaLock.lock();
                     try {
                         waitingCar.set(thisCarData);
                         waitingPassengersQueue.release(SEATS_CNT);
@@ -42,20 +43,22 @@ public class _08_rollerCoaster {
                         thisCarData.carLoadedBarrier.await();
                         System.out.printf("Car #%d has loaded all passengers...\n", carID);
                     } finally {
-                        carLock.unlock();
+                        loadingAreaLock.unlock();
                     }
 
                     System.out.printf("Car #%d is driving the passengers...\n", carID);
                     Thread.sleep(3000 + ThreadLocalRandom.current().nextInt() % 3000);
 
-                    System.out.printf("Car #%d has finished the ride & arrived at the entrance...\n", carID);
+                    System.out.printf("Car #%d has finished the ride & arrived at the unloading area...\n", carID);
 
-                    carLock.lock();
+                    unloadingAreaLock.lock();
                     try {
+                        System.out.printf("Car #%d is unloading the passengers...\n", carID);
+                        Thread.sleep(2000 + ThreadLocalRandom.current().nextInt() % 2000);
                         thisCarData.carUnloadedBarrier.await();
                         System.out.printf("Car #%d has unloaded all passengers...\n", carID);
                     } finally {
-                        carLock.unlock();
+                        unloadingAreaLock.unlock();
                     }
                 }
             }));
