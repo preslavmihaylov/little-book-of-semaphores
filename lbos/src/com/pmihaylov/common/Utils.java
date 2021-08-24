@@ -9,6 +9,9 @@ public class Utils {
         } catch (InterruptedException | BrokenBarrierException e) {
             System.out.println("thread was interrupted");
             Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            System.out.println("Unexpected exception occured: " + e);
+            throw e;
         }
     }
 
